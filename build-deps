@@ -1,0 +1,11 @@
+bzip2-dev
+curl
+linux-headers
+ncurses-dev
+openssl-dev
+patch
+readline-dev
+sqlite-dev
+sqlite-dev
+xz-dev
+zlib-dev

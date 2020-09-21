@@ -1,14 +1,12 @@
 FROM alpine:3
 
 ENV PATH="$PATH:/root/.pyenv/bin:/root/.pyenv/shims"
+ADD build-deps /tmp/build-deps
+ADD run-deps /tmp/run-deps
 ADD requirements.txt /tmp/requirements.txt
 
-RUN apk add --no-cache --virtual=.build-deps \
-        curl git linux-headers openssl-dev sqlite-dev readline-dev \
-        bzip2-dev ncurses-dev sqlite-dev patch xz-dev zlib-dev && \
-    apk add --no-cache --virtual=.run-deps bash build-base curl-dev openssl \
-        readline libffi libbz2 libffi-dev bzip2 ncurses sqlite sqlite-libs \
-        zlib xz postgresql-dev ca-certificates && \
+RUN xargs -a /tmp/build-deps apk add --no-cache --virtual=.build-deps && \
+    xargs -a /tmp/run-deps apk add --no-cache --virtual=.run-deps && \
     curl --location https://raw.githubusercontent.com/pyenv/pyenv-installer/master/bin/pyenv-installer | bash && \
     pyenv update && \
     pyenv install 2.7.18 && \
