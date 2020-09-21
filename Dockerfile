@@ -16,7 +16,7 @@ RUN xargs -a /tmp/build-deps apk add --no-cache --virtual=.build-deps && \
     pyenv install 3.8.5 && \
     pyenv global 3.8.5 3.7.9 3.6.12 3.5.10 2.7.18 && \
     pyenv rehash && \
-    pip install -r requirements.txt && \
+    pip install -r /tmp/requirements.txt && \
     apk del .build-deps && \
     rm -rf /var/cache/apk/* && \
     rm -rf /tmp/* && \
