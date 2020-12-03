@@ -13,7 +13,7 @@ ADD build-deps /tmp/build-deps
 ADD requirements.txt /tmp/requirements.txt
 ADD python-versions /tmp/python-versions
 
-RUN apt-get update && \
+RUN apt-get update && apt-get upgrade -y && \
     xargs -a /tmp/build-deps apt-get install -y --no-install-recommends && \
     curl --location https://raw.githubusercontent.com/pyenv/pyenv-installer/master/bin/pyenv-installer | bash && \
     pyenv update && \
