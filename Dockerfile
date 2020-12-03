@@ -1,27 +1,30 @@
-FROM alpine:3
+FROM ubuntu:20.04
 
-ENV PATH="$PATH:/root/.pyenv/bin:/root/.pyenv/shims"
+ARG DEBIAN_FRONTEND="noninteractive"
+
+# set the variables as per $(pyenv init -)
+ENV LANG="C.UTF-8" \
+    LC_ALL="C.UTF-8" \
+    PATH="/opt/pyenv/shims:/opt/pyenv/bin:$PATH" \
+    PYENV_ROOT="/opt/pyenv" \
+    PYENV_SHELL="bash"
+
 ADD build-deps /tmp/build-deps
-ADD run-deps /tmp/run-deps
 ADD requirements.txt /tmp/requirements.txt
+ADD python-versions /tmp/python-versions
 
-RUN xargs -a /tmp/build-deps apk add --no-cache --virtual=.build-deps && \
-    xargs -a /tmp/run-deps apk add --no-cache --virtual=.run-deps && \
+RUN apt-get update && apt-get upgrade -y && \
+    xargs -a /tmp/build-deps apt-get install -y --no-install-recommends && \
     curl --location https://raw.githubusercontent.com/pyenv/pyenv-installer/master/bin/pyenv-installer | bash && \
     pyenv update && \
-    pyenv install 2.7.18 && \
-    pyenv install 3.5.10 && \
-    pyenv install 3.6.12 && \
-    pyenv install 3.7.9 && \
-    pyenv install 3.8.5 && \
-    pyenv global 3.8.5 3.7.9 3.6.12 3.5.10 2.7.18 && \
+    for version in `cat /tmp/python-versions`; do pyenv install $version; done && \
+    xargs -a /tmp/python-versions pyenv global && \
     pyenv rehash && \
-    pip install -r /tmp/requirements.txt && \
-    apk del .build-deps && \
-    rm -rf /var/cache/apk/* && \
-    rm -rf /tmp/* && \
-    find /root/.pyenv/versions -type d '(' -name '__pycache__' -o -name 'test' -o -name 'tests' ')' -exec rm -rfv '{}' + && \
-    find /root/.pyenv/versions -type f '(' -name '*.py[co]' -o -name '*.exe' ')' -exec rm -fv '{}' +
+    pip3 install --upgrade pip && \
+    pip3 install -r /tmp/requirements.txt && \
+    rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* && \
+    find ${PYENV_ROOT}/versions -type d '(' -name '__pycache__' -o -name 'test' -o -name 'tests' ')' -exec rm -rfv '{}' + && \
+    find ${PYENV_ROOT}/versions -type f '(' -name '*.py[co]' -o -name '*.exe' ')' -exec rm -fv '{}' +
 
 CMD ["tox"]
 LABEL name=tox maintainer="nagy.attila@gmail.com"
