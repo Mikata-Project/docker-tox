@@ -41,4 +41,4 @@ jobs:
           push: true
           tags: |
             ${{ secrets.DOCKERHUB_USERNAME }}/tox:latest
-            ${{ secrets.DOCKERHUB_USERNAME }}/tox:${{ steps.release.outputs.version }}"
+            ${{ secrets.DOCKERHUB_USERNAME }}/tox:${{ steps.release.outputs.version }}
